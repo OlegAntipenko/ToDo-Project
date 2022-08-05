@@ -1,0 +1,13 @@
+{% extends 'todo/main.html' %}
+{% block content %}
+<a href="{% url 'tasks' %}"> << Back </a>
+<div style="padding: 20px;">
+    <h1> Profile </h1>
+    <h2> first_name: {{profile.first_name}} </h2>
+    <h2> last_name: {{profile.last_name}} </h2>
+    <h2> job_title: {{profile.job_title}} </h2>
+
+    <span><a href="">Edit profile</a></span>
+</div>
+
+{% endblock content %}

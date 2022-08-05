@@ -1,0 +1,16 @@
+{% extends 'todo/main.html' %}
+{% block content %}
+<a href="{% url 'tasks' %}"> << Back </a>
+<div style="padding: 20px;">
+    <h3 style="margin:0;">You have <i>{{tasks}}</i> task{{ count_todo|pluralize:"s" }} total</h3>
+    <h3 style="margin:0; color: #00BFFF">You have <i>{{count_todo}}</i> task{{ count_todo|pluralize:"s" }} status todo</h3>
+<h3 style="margin:0; color: #0000FF">You have <i>{{count_in_progres}}</i> task{{ count_in_progres|pluralize:"s" }}
+    status in_progres</h3>
+<h3 style="margin:0; color: #FF0000">You have <i>{{count_blocked}}</i> task{{ count_blocked|pluralize:"s" }} status
+    blocked</h3>
+<h3 style="margin:0; color: #008000">You have <i>{{count_finished}}</i> task{{ count_finished|pluralize:"s" }} status
+    finished</h3>
+
+</div>
+
+{% endblock content %}

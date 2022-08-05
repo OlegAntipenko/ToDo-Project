@@ -1,0 +1,41 @@
+{% extends 'todo/main.html' %}
+{% block content %}
+
+<h1>My To Do List</h1>
+
+<div id="search-add-wrapper">
+    <form method="GET" style="margin-top: 20px; display; flex">
+        <input type="text" name="search_area" value="{{search_input}}">
+        <input type="submit" value="Search">
+    </form>
+    <a id="add-link" href="{% url 'task_create' %}">Add Task</a>
+</div>
+
+<div id="tasklist" class="task-items-wrapper">
+    {% for task in tasks %}
+    <div class="task-wrapper" data-position="{{task.pk}}">
+        <div class="task-title">
+            <a href="{% url 'task' task.id %}">{{task.title}}</a>
+        </div>
+        <div class="task-title">
+            <p style="color: #DC143C;">Deadline: {{task.deadline}}</p>
+        </div>
+
+        <div class="task-controls">
+            <a class="handle" href="{% url 'task_update' task.id %}">&#9998;</a>
+            <a class="delete-link" href="{% url 'task_delete' task.id %}">&#215;</a>
+        </div>
+    </div>
+    <div class="task-title"><p>{{task.text|linebreaks|truncatewords:10}}</p></div>
+
+    {% empty %}
+    <div style="text-align: center; padding-bottom: 10px; line-height: 1em;">
+        <h3>No new tasks are created.</h3>
+        <h3>Create a <a style="text-decoration: none; color: #e53935;" href="{% url 'task_create' %}">New task</a> !
+        </h3>
+    </div>
+    {% endfor %}
+</div>
+
+
+{% endblock content %}

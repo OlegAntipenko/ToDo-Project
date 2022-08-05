@@ -1,0 +1,17 @@
+{% extends 'todo/main.html' %}
+{% block content %}
+<a href="{% url 'tasks' %}"> << Back </a>
+<div style="padding: 20px;">
+    {% if object.importance == True %}
+        <h1><label style="color:red">*</label> {{object.title}} </h1>
+    {% else %}
+        <h1>{{object.title}} </h1>
+    {% endif %}
+    <h4> status: {{object.status}} </h4>
+    <h4> priorities: {{object.priorities}} </h4>
+    <h4> deadline: {{object.deadline}} </h4>
+    <p>{{object.text|linebreaks}} </p>
+    <span><a href="{% url 'tasks' %}">Back to Task List</a></span>
+</div>
+
+{% endblock content %}
