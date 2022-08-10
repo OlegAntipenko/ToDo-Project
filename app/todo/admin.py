@@ -10,7 +10,7 @@ class UserAdminList(admin.ModelAdmin):
 
 
 class TaskAdminList(admin.ModelAdmin):
-    list_display = ('title', 'text', 'user')
+    list_display = ('title', 'text', 'user', 'date_create', 'deadline')
     list_display_links = ('title',)
     search_fields = ('title',)
     fields = ('title', 'text', 'status', 'user')

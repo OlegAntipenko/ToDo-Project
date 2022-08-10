@@ -37,6 +37,7 @@ class Task(models.Model):
         default='medium'
     )
     importance = models.BooleanField(default=False)
+    date_create = models.DateField(auto_now_add=True)
     deadline = models.DateField(default=date.today)
     user = models.ForeignKey(
         User,

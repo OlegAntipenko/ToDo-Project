@@ -7,7 +7,8 @@
     <h2> last_name: {{profile.last_name}} </h2>
     <h2> job_title: {{profile.job_title}} </h2>
 
-    <span><a href="">Edit profile</a></span>
+    <span><a href="{% url 'profile_update' user.id %}">Edit profile</a></span>
 </div>
+
 
 {% endblock content %}

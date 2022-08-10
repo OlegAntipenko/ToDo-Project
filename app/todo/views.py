@@ -18,7 +18,6 @@ from .models import Task, User
 from .serializers import TaskSerializer, TaskUpdateSerializer, TaskCreateSerializer
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters
-from .tasks import send_mail
 
 
 class CustomLoginView(LoginView):
@@ -48,14 +47,16 @@ class RegisterPage(FormView):
         return super(RegisterPage, self).get(*args, **kwargs)
 
 
-
-
 class TaskList(LoginRequiredMixin, ListView):
-    paginate_by = 3
+    # paginate_by = 3
     model = Task
     context_object_name = 'tasks'
     template_name = 'todo/task_list.html'
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['tasks'] = context['tasks'].filter(user=self.request.user)
+        return context
 
 
 class TaskDetail(LoginRequiredMixin, DetailView):
@@ -70,17 +71,25 @@ class Statistics(LoginRequiredMixin, ListView):
     template_name = 'todo/statistics.html'
 
     def get_context_data(self, **kwargs):
-        tasks = Task.objects.all().count()
-        count_todo = Task.objects.filter(status='todo').count()
-        count_in_progres = Task.objects.filter(status='in_progres').count()
-        count_blocked = Task.objects.filter(status='blocked').count()
-        count_finished = Task.objects.filter(status='finished').count()
+        task = Task.objects.all().filter(user=self.request.user)
+        tasks = Task.objects.all().filter(user=self.request.user).count()
+        count_todo = Task.objects.filter(status='todo').filter(user=self.request.user).count()
+        count_in_progres = Task.objects.filter(status='in_progres').filter(user=self.request.user).count()
+        count_blocked = Task.objects.filter(status='blocked').filter(user=self.request.user).count()
+        count_finished = Task.objects.filter(status='finished').filter(user=self.request.user).count()
+        date_completion = 0
+        for i in task:
+            completion = (i.deadline - i.date_create).days
+            date_completion = date_completion +completion
+        date_completion = int(date_completion/tasks)
+
         context = {
             'tasks': tasks,
             'count_todo': count_todo,
             'count_in_progres': count_in_progres,
             'count_blocked': count_blocked,
-            'count_finished': count_finished
+            'count_finished': count_finished,
+            'date_completion': date_completion
         }
         return context
 
@@ -89,6 +98,12 @@ class ProfileDetail(LoginRequiredMixin, DetailView):
     model = User
     context_object_name = 'profile'
     template_name = 'todo/profile.html'
+
+
+class ProfileUpdate(LoginRequiredMixin, UpdateView):
+    model = User
+    fields = ['first_name', 'last_name', 'job_title', 'email']
+    success_url = reverse_lazy('tasks')
 
 
 class TaskCreate(LoginRequiredMixin, CreateView):
@@ -130,7 +145,6 @@ class TaskListViewSet(ListModelMixin, GenericViewSet):
     filter_backends = [DjangoFilterBackend, filters.SearchFilter]
     filterset_fields = ['status']
     search_fields = ['title']
-
 
 
 class TaskUpdateViewSet(RetrieveModelMixin, UpdateModelMixin, GenericViewSet):
