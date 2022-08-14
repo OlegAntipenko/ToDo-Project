@@ -1,3 +1,5 @@
+from datetime import date
+
 from django.shortcuts import render, redirect
 from rest_framework.response import Response
 from django.http import HttpResponse
@@ -48,15 +50,15 @@ class RegisterPage(FormView):
 
 
 class TaskList(LoginRequiredMixin, ListView):
-    # paginate_by = 3
+    paginate_by = 2
     model = Task
     context_object_name = 'tasks'
     template_name = 'todo/task_list.html'
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['tasks'] = context['tasks'].filter(user=self.request.user)
-        return context
+    def get_queryset(self):
+        queryset = super().get_queryset().filter(user=self.request.user)
+        return queryset
+
 
 
 class TaskDetail(LoginRequiredMixin, DetailView):
@@ -71,17 +73,17 @@ class Statistics(LoginRequiredMixin, ListView):
     template_name = 'todo/statistics.html'
 
     def get_context_data(self, **kwargs):
-        task = Task.objects.all().filter(user=self.request.user)
-        tasks = Task.objects.all().filter(user=self.request.user).count()
+        tasks = Task.objects.filter(user=self.request.user).count()
         count_todo = Task.objects.filter(status='todo').filter(user=self.request.user).count()
         count_in_progres = Task.objects.filter(status='in_progres').filter(user=self.request.user).count()
         count_blocked = Task.objects.filter(status='blocked').filter(user=self.request.user).count()
         count_finished = Task.objects.filter(status='finished').filter(user=self.request.user).count()
         date_completion = 0
-        for i in task:
-            completion = (i.deadline - i.date_create).days
-            date_completion = date_completion +completion
-        date_completion = int(date_completion/tasks)
+        task_finished = Task.objects.filter(status='finished').filter(user=self.request.user)
+        for i in task_finished:
+            completion = (i.date_finished - i.date_create).days
+            date_completion = date_completion + completion
+        date_completion = int(date_completion / count_finished)
 
         context = {
             'tasks': tasks,
@@ -118,7 +120,7 @@ class TaskCreate(LoginRequiredMixin, CreateView):
 
 class TaskUpdate(LoginRequiredMixin, UpdateView):
     model = Task
-    fields = ['title', 'text', 'status', 'priorities', 'importance', 'deadline']
+    fields = ['title', 'text', 'priorities', 'importance', 'deadline']
     success_url = reverse_lazy('tasks')
 
 
@@ -180,6 +182,7 @@ class TaskUpdateViewSet(RetrieveModelMixin, UpdateModelMixin, GenericViewSet):
     def set_as_finished(self, request, pk=None):
         task = self.get_object()
         task.status = 'finished'
+        task.date_finished = date.today
         task.save()
         serializer = self.get_serializer(task)
         return Response(serializer.data)

@@ -14,3 +14,10 @@ app.conf.beat_schedule = {
         'schedule': crontab(minute=0, hour=8),
     }
 }
+
+app.conf.beat_schedule = {
+    'send-regularly-mail': {
+        'task': 'app.tasks.send_week_email',
+        'schedule': crontab(minute=0, hour=8, day_of_week='sat'),
+    }
+}
